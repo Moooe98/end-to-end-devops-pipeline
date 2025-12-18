@@ -1,5 +1,42 @@
 # Web Application Deployment Project
-![Pipeline Overview](./src/Overview.png)
+```mermaid
+graph TD
+    %% Node Styles
+    classDef aws fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:white;
+    classDef ci fill:#333,stroke:#D33833,stroke-width:2px,color:white;
+    classDef k8s fill:#326CE5,stroke:#333,stroke-width:2px,color:white;
+    classDef scm fill:#000,stroke:#fff,stroke-width:2px,color:white;
+    classDef monitor fill:#E6522C,stroke:#333,stroke-width:2px,color:white;
+    
+    subgraph "Planning & Code"
+        Dev[User / Developer] -->|Commit Code| GitHub[GitHub Repo]:::scm
+        TF[Terraform] -->|Provision Infra| AWS_Cloud[AWS Cloud Resources]:::aws
+    end
+
+    subgraph "CI Pipeline (Jenkins)"
+        GitHub -->|Webhook Trigger| Jenkins[Jenkins Server]:::ci
+        Jenkins -->|1. Checkout| Step1(Git Checkout)
+        Step1 -->|2. Analysis| Sonar[SonarQube Analysis]
+        Sonar -->|3. Dependencies| Node[NPM Install]
+        Node -->|4. Security| Trivy[Trivy File Scan]
+        Trivy -->|5. Build| Docker[Docker Build]
+        Docker -->|6. Push| ECR[AWS ECR Registry]:::aws
+    end
+
+    subgraph "CD & Operations (AWS)"
+        ArgoCD[ArgoCD Controller]:::k8s -->|Sync Manifests| EKS[AWS EKS Cluster]:::aws
+        ECR -.->|Pull Image| EKS
+    end
+
+    subgraph "Observability"
+        Prom[Prometheus]:::monitor -.->|Scrape Metrics| EKS
+        Grafana[Grafana]:::monitor -->|Visualize| Prom
+    end
+
+    %% Connect Infrastructure
+    AWS_Cloud -.-> EKS
+    AWS_Cloud -.-> ECR
+```
 
 ## Project Overview
 This project demonstrates the complete deployment of a containerized web application using modern DevOps practices and tools. The focus is on automating infrastructure provisioning, continuous integration, continuous delivery, security scanning, and monitoring to ensure a production-ready workflow.
