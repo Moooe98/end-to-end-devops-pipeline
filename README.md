@@ -2,7 +2,7 @@
 
 ```mermaid
 graph LR
-    subgraph "Development &amp; Infrastructure"
+    subgraph "Development & Infrastructure"
         Git[GitHub Repository]
         TF[Terraform IaC]
     end
@@ -10,7 +10,7 @@ graph LR
     subgraph "CI Pipeline (Jenkins)"
         direction TB
         S1[SonarQube: Static Analysis]
-        S2[NPM: Build &amp; Test]
+        S2[NPM: Build & Test]
         S3[Trivy: Security Scan]
         S4[Docker: Image Build]
     end
@@ -19,12 +19,12 @@ graph LR
         ECR[(AWS ECR)]
     end
 
-    subgraph "CD &amp; Deployment (GitOps)"
+    subgraph "CD & Deployment (GitOps)"
         Argo{Argo CD}
         EKS[AWS EKS Cluster]
     end
 
-    subgraph "Monitoring &amp; Observability"
+    subgraph "Monitoring & Observability"
         Prom[Prometheus]
         Graf[Grafana Dashboards]
     end
