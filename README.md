@@ -1,5 +1,51 @@
 # Web Application Deployment Project
-![Pipeline Overview](./src/Overview.png)
+
+```mermaid
+graph LR
+    subgraph "Development &amp; Infrastructure"
+        Git[GitHub Repository]
+        TF[Terraform IaC]
+    end
+
+    subgraph "CI Pipeline (Jenkins)"
+        direction TB
+        S1[SonarQube: Static Analysis]
+        S2[NPM: Build &amp; Test]
+        S3[Trivy: Security Scan]
+        S4[Docker: Image Build]
+    end
+
+    subgraph "Cloud Registry"
+        ECR[(AWS ECR)]
+    end
+
+    subgraph "CD &amp; Deployment (GitOps)"
+        Argo{Argo CD}
+        EKS[AWS EKS Cluster]
+    end
+
+    subgraph "Monitoring &amp; Observability"
+        Prom[Prometheus]
+        Graf[Grafana Dashboards]
+    end
+
+    %% Flow lines
+    Git -->|Webhook| S1
+    TF -.->|Provisions| EKS
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 -->|Push Image| ECR
+    ECR -.->|Pull Image| Argo
+    Argo -->|Sync/Deploy| EKS
+    EKS --- Prom
+    Prom --- Graf
+
+    style Git fill:#f9f,stroke:#333,stroke-width:2px
+    style EKS fill:#ff9,stroke:#f66,stroke-width:2px
+    style Argo fill:#f96,stroke:#333,stroke-width:2px
+    style ECR fill:#69f,stroke:#333
+```
 
 ## Project Overview
 This project demonstrates the complete deployment of a containerized web application using modern DevOps practices and tools. The focus is on automating infrastructure provisioning, continuous integration, continuous delivery, security scanning, and monitoring to ensure a production-ready workflow.
